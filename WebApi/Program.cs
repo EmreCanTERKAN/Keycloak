@@ -11,6 +11,8 @@ builder.Services.AddOpenApi();
 builder.Services.Configure<KeycloakConfiguration>(builder.Configuration.GetSection("KeycloakConfiguration"));
 builder.Services.AddScoped<KeycloakService>();
 
+builder.Services.AddControllers();
+
 var app = builder.Build();
 app.UseHttpsRedirection();
 
@@ -30,5 +32,7 @@ app.MapGet("/get-access-token", async (KeycloakService keycloakService) =>
     var token = await keycloakService.GetAccessToken(default);
     return Results.Ok(new { AccessToken = token});
 });
+
+app.MapControllers();
 
 app.Run();
