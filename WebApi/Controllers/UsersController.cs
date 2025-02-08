@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using TS.Result;
 using WebApi.Dtos;
 using WebApi.Options;
 using WebApi.Services;
@@ -8,6 +7,7 @@ using WebApi.Services;
 namespace WebApi.Controllers;
 [Route("api/[controller]/[action]")]
 [ApiController]
+//[Authorize]
 public sealed class UsersController(KeycloakService keycloakService, IOptions<KeycloakConfiguration> options) : ControllerBase
 {
     [HttpGet]
@@ -16,5 +16,43 @@ public sealed class UsersController(KeycloakService keycloakService, IOptions<Ke
         string endpoint = $"{options.Value.HostName}/admin/realms/{options.Value.Realm}/users";
         var response = await keycloakService.GetAsync<List<UserDto>>(endpoint, true, cancellationToken);
         return StatusCode(Response.StatusCode, response);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetByEmail(string email ,CancellationToken cancellationToken)
+    {
+        string endpoint = $"{options.Value.HostName}/admin/realms/{options.Value.Realm}/users?email={email}";
+        var response = await keycloakService.GetAsync<List<UserDto>>(endpoint, true, cancellationToken);
+        return StatusCode(Response.StatusCode, response);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetByUserName(string username, CancellationToken cancellationToken)
+    {
+        string endpoint = $"{options.Value.HostName}/admin/realms/{options.Value.Realm}/users?username={username}";
+        var response = await keycloakService.GetAsync<List<UserDto>>(endpoint, true, cancellationToken);
+        return StatusCode(Response.StatusCode, response);
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
+    {
+        string endpoint = $"{options.Value.HostName}/admin/realms/{options.Value.Realm}/users/{id}";
+        var response = await keycloakService.GetAsync<UserDto>(endpoint, true, cancellationToken);
+        return StatusCode(Response.StatusCode, response);
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> Update(Guid id,UpdateUserDto request, CancellationToken cancellationToken = default)
+    {
+        string endpoint = $"{options.Value.HostName}/admin/realms/{options.Value.Realm}/users/{id}";
+
+        var response = await keycloakService.PutAsync<string>(endpoint, request, true, cancellationToken);
+
+        if (response.IsSuccessful && response.Data is null)
+        {
+            response.Data = "UserUpdate is successfull";
+        }
+        return StatusCode(response.StatusCode, response);
+
     }
 }
