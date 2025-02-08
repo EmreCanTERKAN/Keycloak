@@ -99,7 +99,7 @@ public sealed class KeycloakService(
                 var errorResultForBadRequest = JsonSerializer.Deserialize<BadRequestErrorResponseDto>(response);
                 return Result<T>.Failure(errorResultForBadRequest!.ErrorDescription);
             }
-            else if(message.StatusCode == HttpStatusCode.Unauthorized)
+            else if (message.StatusCode == HttpStatusCode.Unauthorized)
             {
                 var errorResultForBadRequest = JsonSerializer.Deserialize<BadRequestErrorResponseDto>(response);
                 return Result<T>.Failure(errorResultForBadRequest!.ErrorDescription);
@@ -109,6 +109,46 @@ public sealed class KeycloakService(
             var errorResultForOther = JsonSerializer.Deserialize<ErrorResponseDto>(response);
             return Result<T>.Failure(errorResultForOther!.ErrorMessage);
 
+        }
+
+        if (message.StatusCode == HttpStatusCode.Created || message.StatusCode == HttpStatusCode.Created)
+        {
+            return Result<T>.Succeed(default!);
+        }
+        var obj = JsonSerializer.Deserialize<T>(response);
+
+        return Result<T>.Succeed(obj!);
+    }
+
+    public async Task<Result<T>> GetAsync<T>(string endpoint, bool requiredToken = false, CancellationToken cancellationToken = default)
+    {
+
+        HttpClient httpClient = new();
+
+        if (requiredToken)
+        {
+            string token = await GetAccessToken();
+            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+        }
+
+
+        var message = await httpClient.GetAsync(endpoint, cancellationToken);
+
+        var response = await message.Content.ReadAsStringAsync();
+
+
+
+        if (!message.IsSuccessStatusCode)
+        {
+
+            if (message.StatusCode == HttpStatusCode.BadRequest)
+            {
+                var errorResultForBadRequest = JsonSerializer.Deserialize<BadRequestErrorResponseDto>(response);
+                return Result<T>.Failure(errorResultForBadRequest!.ErrorDescription);
+            }
+
+            var errorResultForOther = JsonSerializer.Deserialize<ErrorResponseDto>(response);
+            return Result<T>.Failure(errorResultForOther!.ErrorMessage);
         }
 
         if (message.StatusCode == HttpStatusCode.Created || message.StatusCode == HttpStatusCode.Created)

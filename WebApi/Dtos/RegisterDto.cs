@@ -1,7 +1,7 @@
 ﻿namespace WebApi.Dtos;
 
 public sealed record RegisterDto(
-    string UserName,
+    string Username,
     string FirstName,
     string LastName,
     string Email,

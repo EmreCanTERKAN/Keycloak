@@ -16,7 +16,7 @@ public sealed class AuthController(IOptions<KeycloakConfiguration> options, Keyc
         string endpoint = $"{options.Value.HostName}/admin/realms/{options.Value.Realm}/users";
         object data = new
         {
-            username = registerDto.UserName,
+            username = registerDto.Username,
             firstName = registerDto.FirstName,
             lastName = registerDto.LastName,
             email = registerDto.Email,
@@ -53,7 +53,7 @@ public sealed class AuthController(IOptions<KeycloakConfiguration> options, Keyc
         KeyValuePair<string, string> grantType = new("grant_type", "password");
         KeyValuePair<string, string> clientId = new("client_id", options.Value.ClientId);
         KeyValuePair<string, string> clientSecret = new("client_secret", options.Value.ClientSecret);
-        KeyValuePair<string, string> userName = new("username", request.UserName);
+        KeyValuePair<string, string> userName = new("username", request.Username);
         KeyValuePair<string, string> password = new("password", request.Password);
         data.Add(grantType);
         data.Add(clientId);
