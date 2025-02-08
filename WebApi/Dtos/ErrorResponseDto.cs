@@ -2,7 +2,7 @@
 
 namespace WebApi.Dtos;
 
-public class ErrorResponseDto
+public sealed class BadRequestErrorResponseDto
 {
     [JsonPropertyName("error")]
     public string Error { get; set; } = default!;
@@ -10,7 +10,7 @@ public class ErrorResponseDto
     public string ErrorDescription { get; set; } = default!;
 }
 
-public class BadRequestErrorResponseDto
+public sealed class ErrorResponseDto
 {
     [JsonPropertyName("error")]
     public string Field { get; set; } = default!;
