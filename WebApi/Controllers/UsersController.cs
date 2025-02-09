@@ -55,4 +55,19 @@ public sealed class UsersController(KeycloakService keycloakService, IOptions<Ke
         return StatusCode(response.StatusCode, response);
 
     }
+
+    [HttpDelete]
+    public async Task<IActionResult> DeleteById(Guid id, CancellationToken cancellationToken = default)
+    {
+        string endpoint = $"{options.Value.HostName}/admin/realms/{options.Value.Realm}/users/{id}";
+
+        var response = await keycloakService.DeleteAsync<string>(endpoint, true, cancellationToken);
+
+        if (response.IsSuccessful && response.Data is null)
+        {
+            response.Data = "UserDelete is successfull";
+        }
+        return StatusCode(response.StatusCode, response);
+
+    }
 }
