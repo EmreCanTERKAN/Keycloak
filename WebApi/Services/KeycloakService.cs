@@ -247,4 +247,44 @@ public sealed class KeycloakService(
 
         return Result<T>.Succeed(obj!);
     }
+
+    public async Task<Result<T>> DeleteAsync<T>(string endpoint, object data, bool reqToken = false, CancellationToken cancellationToken = default)
+    {
+
+        if (reqToken)
+        {
+            string token = await GetAccessToken();
+
+            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+        }
+
+        var request = new HttpRequestMessage(HttpMethod.Delete, endpoint);
+        string str = JsonSerializer.Serialize(data);
+        request.Content = new StringContent(str, Encoding.UTF8, "application/json");
+
+        var message = await _httpClient.SendAsync(request,cancellationToken);
+
+        var response = await message.Content.ReadAsStringAsync();
+
+        if (!message.IsSuccessStatusCode)
+        {
+            if (message.StatusCode == HttpStatusCode.BadRequest)
+            {
+                var errorResultForBadRequest = JsonSerializer.Deserialize<BadRequestErrorResponseDto>(response);
+                return Result<T>.Failure(errorResultForBadRequest!.ErrorDescription);
+            }
+
+            var errorResultForOther = JsonSerializer.Deserialize<ErrorResponseDto>(response);
+            return Result<T>.Failure(errorResultForOther!.ErrorMessage);
+        }
+
+        if (message.StatusCode == HttpStatusCode.Created || message.StatusCode == HttpStatusCode.NoContent)
+        {
+            return Result<T>.Succeed(default!);
+        }
+
+        var obj = JsonSerializer.Deserialize<T>(response);
+
+        return Result<T>.Succeed(obj!);
+    }
 }

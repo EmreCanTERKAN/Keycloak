@@ -1,4 +1,5 @@
 using Keycloak.AuthServices.Authentication;
+using Keycloak.AuthServices.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using WebApi.Options;
@@ -46,6 +47,28 @@ builder.Services.AddControllers();
 
 builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration);
 builder.Services.AddAuthentication();
+builder.Services.AddAuthorization(opt =>
+{
+    opt.AddPolicy("UserGetAll", builder =>
+    {
+        builder.RequireResourceRoles("UserGetAll");
+    });
+    opt.AddPolicy("UserCreate", builder =>
+    {
+        builder.RequireResourceRoles("UserCreate");
+    });
+    opt.AddPolicy("UserUpdate", builder =>
+    {
+        builder.RequireResourceRoles( "UserUpdate");
+    });
+    opt.AddPolicy("UserDelete", builder =>
+    {
+        builder.RequireResourceRoles("UserDelete");
+    });
+}).AddKeycloakAuthorization(builder.Configuration);
+
+
+
 
 var app = builder.Build();
 app.UseHttpsRedirection();

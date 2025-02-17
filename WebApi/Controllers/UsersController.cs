@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using WebApi.Dtos;
 using WebApi.Options;
@@ -7,10 +8,11 @@ using WebApi.Services;
 namespace WebApi.Controllers;
 [Route("api/[controller]/[action]")]
 [ApiController]
-//[Authorize]
+[Authorize]
 public sealed class UsersController(KeycloakService keycloakService, IOptions<KeycloakConfiguration> options) : ControllerBase
 {
     [HttpGet]
+    [Authorize("UserGetAll")]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         string endpoint = $"{options.Value.HostName}/admin/realms/{options.Value.Realm}/users";
@@ -19,6 +21,7 @@ public sealed class UsersController(KeycloakService keycloakService, IOptions<Ke
     }
 
     [HttpGet]
+    [Authorize("UserGetAll")]
     public async Task<IActionResult> GetByEmail(string email ,CancellationToken cancellationToken)
     {
         string endpoint = $"{options.Value.HostName}/admin/realms/{options.Value.Realm}/users?email={email}";
@@ -27,6 +30,7 @@ public sealed class UsersController(KeycloakService keycloakService, IOptions<Ke
     }
 
     [HttpGet]
+    [Authorize("UserGetAll")]
     public async Task<IActionResult> GetByUserName(string username, CancellationToken cancellationToken)
     {
         string endpoint = $"{options.Value.HostName}/admin/realms/{options.Value.Realm}/users?username={username}";
@@ -34,6 +38,7 @@ public sealed class UsersController(KeycloakService keycloakService, IOptions<Ke
         return StatusCode(Response.StatusCode, response);
     }
     [HttpGet]
+    [Authorize("UserGetAll")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         string endpoint = $"{options.Value.HostName}/admin/realms/{options.Value.Realm}/users/{id}";
@@ -42,6 +47,7 @@ public sealed class UsersController(KeycloakService keycloakService, IOptions<Ke
     }
 
     [HttpPut]
+    [Authorize("UserUpdate")]
     public async Task<IActionResult> Update(Guid id,UpdateUserDto request, CancellationToken cancellationToken = default)
     {
         string endpoint = $"{options.Value.HostName}/admin/realms/{options.Value.Realm}/users/{id}";
@@ -57,6 +63,7 @@ public sealed class UsersController(KeycloakService keycloakService, IOptions<Ke
     }
 
     [HttpDelete]
+    [Authorize("UserDelete")]
     public async Task<IActionResult> DeleteById(Guid id, CancellationToken cancellationToken = default)
     {
         string endpoint = $"{options.Value.HostName}/admin/realms/{options.Value.Realm}/users/{id}";
