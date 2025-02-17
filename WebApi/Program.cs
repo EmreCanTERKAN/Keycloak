@@ -36,6 +36,8 @@ builder.Services.AddSwaggerGen(setup =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
+builder.Services.AddHttpClient<KeycloakService>();
+
 
 builder.Services.Configure<KeycloakConfiguration>(builder.Configuration.GetSection("KeycloakConfiguration"));
 builder.Services.AddScoped<KeycloakService>();
